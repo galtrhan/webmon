@@ -17,7 +17,7 @@ def load_config(file):
 # Configuration
 config_file = 'config.json'
 config = load_config(config_file)
-database_file = config['database_file']
+database_file = config['database_location']
 
 # Send email notification
 def send_email(subject, body):
@@ -115,7 +115,7 @@ def log_incident(timestamp, url, response):
 
 # Monitor URLs
 def monitor_urls():
-    c = load_config()
+    c = load_config(config_file)
     urls = c['urls']
 
     for url in urls:
@@ -153,7 +153,7 @@ def main():
     monitor_urls()
 
     # Schedule URL monitoring
-    c = load_config()
+    c = load_config(config_file)
     refresh_interval = c['refresh_interval']
     schedule.every(refresh_interval).seconds.do(monitor_urls)
 
