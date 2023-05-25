@@ -1,0 +1,20 @@
+{
+	"urls": [
+		"https://example.com",
+		"https://example.org"
+	],
+	"refresh_interval": 3600,
+	"database_location": "monitoring.db",
+	"smtp": {
+		"host": "smtp.example.com",
+		"port": 587,
+		"username": "username",
+		"password": "password",
+		"sender_email": "",
+		"receiver_email": ""
+	},
+	"fcm": {
+		"server_key": "",
+		"device_token": ""
+	}
+}
