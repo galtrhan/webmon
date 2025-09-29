@@ -1,0 +1,110 @@
+# WebMon - Website Monitoring Tool
+
+## Project Overview
+This is a Python-based website monitoring tool that checks URL availability, logs incidents to SQLite database, and sends notifications via email and FCM push notifications.
+
+## Technology Stack
+- **Language**: Python 3.x
+- **Database**: SQLite3
+- **Dependencies**: requests, schedule, pysqlite3, python-pushover
+- **Configuration**: JSON-based configuration files
+- **Notifications**: SMTP email and FCM push notifications
+
+## Code Style & Standards
+
+### Python Style
+- Follow PEP 8 style guidelines
+- Use meaningful variable and function names
+- Add docstrings for functions and classes
+- Use type hints where appropriate
+- Prefer explicit imports over wildcard imports
+
+### Error Handling
+- Always use try-catch blocks for external API calls (requests, SMTP, FCM)
+- Log errors appropriately with context
+- Handle database connection errors gracefully
+- Validate configuration before use
+
+### Database Operations
+- Always use parameterized queries to prevent SQL injection
+- Close database connections properly (use context managers when possible)
+- Handle database file permissions and locking issues
+
+### Configuration Management
+- Never commit sensitive configuration files (config.json)
+- Always provide sample configuration files (config.sample.json)
+- Validate required configuration keys on startup
+- Use environment variables for sensitive data when possible
+
+## File Structure
+- `main.py` - Main application entry point
+- `config.sample.json` - Sample configuration template
+- `config.json` - Actual configuration (gitignored)
+- `requirements.txt` - Python dependencies
+- `monitoring.db` - SQLite database file
+- `README` - Installation and usage instructions
+
+## Development Guidelines
+
+### Adding New Features
+- Maintain backward compatibility with existing configuration
+- Add new configuration options to config.sample.json
+- Update README with new features
+- Test with multiple URLs and different scenarios
+
+### Monitoring Logic
+- Keep monitoring functions pure and testable
+- Separate concerns: monitoring, logging, notifications
+- Add retry logic for transient failures
+- Consider rate limiting for external API calls
+
+### Notification Systems
+- Make notification methods modular and configurable
+- Support multiple notification channels
+- Handle notification failures gracefully
+- Avoid notification spam (implement cooldown periods)
+
+### Database Schema
+- Use consistent timestamp formats
+- Consider indexing for performance
+- Plan for data retention policies
+- Add migration scripts for schema changes
+
+## Security Considerations
+- Never log sensitive information (passwords, tokens)
+- Use secure SMTP connections (TLS/SSL)
+- Validate URLs before making requests
+- Implement request timeouts
+- Consider rate limiting and DDoS protection
+
+## Testing
+- Test with various HTTP status codes
+- Test network failure scenarios
+- Test database operations
+- Test notification delivery
+- Mock external services in tests
+
+## Performance
+- Use connection pooling for database operations
+- Implement proper logging levels
+- Consider async operations for I/O bound tasks
+- Monitor memory usage for long-running processes
+
+## Deployment
+- Use virtual environments
+- Document system requirements
+- Provide clear installation instructions
+- Consider containerization (Docker)
+- Set up proper logging and monitoring
+
+## Code Organization
+- Keep functions focused and single-purpose
+- Separate configuration loading from business logic
+- Use constants for magic numbers
+- Consider breaking into modules as the project grows
+
+## Documentation
+- Keep README updated with current features
+- Document configuration options clearly
+- Add inline comments for complex logic
+- Provide troubleshooting guides

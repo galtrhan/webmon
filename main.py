@@ -7,6 +7,9 @@ import json
 import schedule
 import time
 from datetime import datetime
+from pprint import pprint
+
+
 
 # Load configuration
 def load_config(file):
@@ -14,14 +17,15 @@ def load_config(file):
         config = json.load(f)
     return config
 
+
 # Configuration
 config_file = 'config.json'
 config = load_config(config_file)
 database_file = config['database_location']
 
+
 # Send email notification
-def send_email(subject, body):
-    
+def send_email(subject, body):    
     # SMTP settings
     smtp_host = config['smtp']['host']
     smtp_port = config['smtp']['port']
@@ -41,17 +45,10 @@ def send_email(subject, body):
     message.attach(body_text)
 
     try:
-        # Create an SMTP session
         with smtplib.SMTP(smtp_host, smtp_port) as server:
-            # Start TLS for security
             server.starttls()
-
-            # Login to the SMTP server
             server.login(smtp_username, smtp_password)
-
-            # Send the email
             server.sendmail(sender_email, receiver_email, message.as_string())
-
         print("Email sent successfully!")
     except smtplib.SMTPException as e:
         print("Error sending email:", str(e))
@@ -93,7 +90,7 @@ def send_push_notification(message):
             print("Failed to send push notification. Status code:", response.status_code)
     except requests.exceptions.RequestException as e:
         print("Error sending push notification:", str(e))
-        
+
 
 # Log data to SQLite database
 def log_to_database(timestamp, url, response):
@@ -107,11 +104,15 @@ def log_to_database(timestamp, url, response):
 def log_incident(timestamp, url, response):
     conn = sqlite3.connect(database_file)
     c = conn.cursor()
-    c.execute("INSERT INTO incidents (timestamp, url, response) VALUES (?, ?, ?)", (timestamp, url, response))
+    c.execute(
+            "INSERT INTO incidents (timestamp, url, response) VALUES (?, ?, ?)",
+            (timestamp, url, response)
+            )
     conn.commit()
     conn.close()
-    send_email("Incident Detected", f"An incident occurred for URL: {url}\nResponse: {response}")
-    send_push_notification(f"Incident detected for URL: {url}")
+    #send_email("Incident Detected", f"An incident occurred for URL: {url}\nResponse: {response}")
+    #send_push_notification(f"Incident detected for URL: {url}")
+
 
 # Monitor URLs
 def monitor_urls():
@@ -132,8 +133,10 @@ def monitor_urls():
             log_to_database(timestamp, url, str(e))
             log_incident(timestamp, url, str(e))
 
+
 # Main function
 def main():
+
     # Initialize the database
     conn = sqlite3.connect(database_file)
     c = conn.cursor()
@@ -161,6 +164,7 @@ def main():
     while True:
         schedule.run_pending()
         time.sleep(1)
+
 
 if __name__ == '__main__':
     main()
