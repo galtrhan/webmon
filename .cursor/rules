@@ -24,6 +24,9 @@ This is a Python-based website monitoring tool that checks URL availability, log
 - Log errors appropriately with context
 - Handle database connection errors gracefully
 - Validate configuration before use
+- Add guard statements to check for required configuration entries
+- Functions should return False/True to indicate success/failure
+- Skip operations gracefully when configuration is incomplete
 
 ### Database Operations
 - Always use parameterized queries to prevent SQL injection
@@ -35,6 +38,10 @@ This is a Python-based website monitoring tool that checks URL availability, log
 - Always provide sample configuration files (config.sample.json)
 - Validate required configuration keys on startup
 - Use environment variables for sensitive data when possible
+- Add guard statements to functions that depend on configuration
+- Check for missing configuration entries before attempting operations
+- Provide clear error messages when configuration is incomplete
+- Return boolean values to indicate operation success/failure
 
 ## File Structure
 - `main.py` - Main application entry point

@@ -18,6 +18,33 @@ def load_config(file):
     return config
 
 
+# Validate configuration
+def validate_config(config):
+    """Validate that all required configuration sections exist"""
+    required_sections = ['urls', 'refresh_interval', 'database_location', 'smtp', 'fcm']
+    missing_sections = []
+    
+    for section in required_sections:
+        if section not in config:
+            missing_sections.append(section)
+    
+    if missing_sections:
+        print(f"ERROR: Missing required configuration sections: {', '.join(missing_sections)}")
+        return False
+    
+    # Validate URLs
+    if not config['urls'] or not isinstance(config['urls'], list):
+        print("ERROR: 'urls' must be a non-empty list")
+        return False
+    
+    # Validate refresh interval
+    if not isinstance(config['refresh_interval'], int) or config['refresh_interval'] <= 0:
+        print("ERROR: 'refresh_interval' must be a positive integer")
+        return False
+    
+    return True
+
+
 # Configuration
 config_file = 'config.json'
 config = load_config(config_file)
@@ -26,6 +53,18 @@ database_file = config['database_location']
 
 # Send email notification
 def send_email(subject, body):    
+    # Check if SMTP configuration is complete
+    required_smtp_keys = ['host', 'port', 'username', 'password', 'sender_email', 'receiver_email']
+    missing_keys = []
+    
+    for key in required_smtp_keys:
+        if not config['smtp'].get(key):
+            missing_keys.append(key)
+    
+    if missing_keys:
+        print(f"Email notification skipped: Missing SMTP configuration: {', '.join(missing_keys)}")
+        return False
+    
     # SMTP settings
     smtp_host = config['smtp']['host']
     smtp_port = config['smtp']['port']
@@ -50,12 +89,25 @@ def send_email(subject, body):
             server.login(smtp_username, smtp_password)
             server.sendmail(sender_email, receiver_email, message.as_string())
         print("Email sent successfully!")
+        return True
     except smtplib.SMTPException as e:
         print("Error sending email:", str(e))
+        return False
         
 
 # Send push notification
 def send_push_notification(message):
+    # Check if FCM configuration is complete
+    required_fcm_keys = ['server_key', 'device_token']
+    missing_keys = []
+    
+    for key in required_fcm_keys:
+        if not config['fcm'].get(key):
+            missing_keys.append(key)
+    
+    if missing_keys:
+        print(f"Push notification skipped: Missing FCM configuration: {', '.join(missing_keys)}")
+        return False
     
     # FCM server key
     fcm_server_key = config['fcm']['server_key']
@@ -86,10 +138,13 @@ def send_push_notification(message):
 
         if response.status_code == 200:
             print("Push notification sent successfully!")
+            return True
         else:
             print("Failed to send push notification. Status code:", response.status_code)
+            return False
     except requests.exceptions.RequestException as e:
         print("Error sending push notification:", str(e))
+        return False
 
 
 # Log data to SQLite database
@@ -110,8 +165,9 @@ def log_incident(timestamp, url, response):
             )
     conn.commit()
     conn.close()
-    #send_email("Incident Detected", f"An incident occurred for URL: {url}\nResponse: {response}")
-    #send_push_notification(f"Incident detected for URL: {url}")
+    # Try to send notifications if configured
+    send_email("Incident Detected", f"An incident occurred for URL: {url}\nResponse: {response}")
+    send_push_notification(f"Incident detected for URL: {url}")
 
 
 # Monitor URLs
@@ -145,6 +201,10 @@ def monitor_urls():
 
 # Main function
 def main():
+    # Validate configuration first
+    if not validate_config(config):
+        print("Configuration validation failed. Please check your config.json file.")
+        return
 
     # Initialize the database
     conn = sqlite3.connect(database_file)
