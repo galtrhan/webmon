@@ -1,4 +1,3 @@
 requests
 pysqlite3
 schedule
-python-pushover

@@ -121,7 +121,16 @@ def monitor_urls():
 
     for url in urls:
         try:
-            response = requests.get(url)
+            # Headers to mimic a real browser and avoid bot detection
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Accept-Encoding': 'gzip, deflate',
+                'Connection': 'keep-alive',
+                'Upgrade-Insecure-Requests': '1',
+            }
+            response = requests.get(url, headers=headers, timeout=30)
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             log_to_database(timestamp, url, response.status_code)
             if response.status_code != 200:
